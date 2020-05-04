@@ -1,0 +1,34 @@
+{
+    "name": "gpii-open-same-tab-extension",
+    "version": "0.0.0",
+    "description": "A browser extension for opening a Morphic MYOB link in an existing tab",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/jobara/gpii-open-same-tab-extension.git"
+    },
+    "keywords": [
+        "MYOB",
+        "Morphic",
+        "browser",
+        "extension"
+    ],
+    "author": "GPII",
+    "license": "BSD-3-Clause",
+    "bugs": {
+        "url": "https://issues.gpii.net"
+    },
+    "homepage": "https://github.com/GPII/gpii-open-same-tab-extension#readme",
+    "devDependencies": {
+        "eslint-config-fluid": "1.4.0",
+        "gpii-grunt-lint-all": "1.0.7",
+        "grunt": "1.1.0",
+        "grunt-cli": "1.3.2",
+        "node-jqunit": "1.1.8",
+        "nyc": "15.0.1",
+        "rimraf": "3.0.2"
+    }
+}
