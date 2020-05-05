@@ -8,8 +8,6 @@ codebase. Please see the version control system's revision history for details o
 
 Copyright 2020
 
-* OCAD University
-* Raising the Floor - International
 * Raising the Floor - US
 
 ## Contributors
