@@ -21,6 +21,7 @@
     },
     "background": {
         "scripts": [
+            "background/openURLs.js",
             "background/background.js"
         ]
     }

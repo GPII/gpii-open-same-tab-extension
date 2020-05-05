@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>Morphic: Open in Same Tab tests</title>
+
+        <link rel="stylesheet" media="screen" href="../../node_modules/infusion/tests/lib/qunit/css/qunit.css" />
+        <link rel="stylesheet" href="../../node_modules/infusion/tests/lib/qunit/addons/composite/qunit-composite.css">
+
+        <script src="../../src/background/openURLs.js"></script>
+
+        <script src="../../node_modules/infusion/dist/infusion-all.js"></script>
+        <script src="../../node_modules/infusion/tests/lib/qunit/js/qunit.js"></script>
+        <script src="../../node_modules/infusion/tests/test-core/jqUnit/js/jqUnit.js"></script>
+        <script src="../../node_modules/sinon-chrome/bundle/sinon-chrome.min.js"></script>
+        <!-- sinon is brought in as a dependency of the sinon-chrome package -->
+        <script src="../../node_modules/sinon/pkg/sinon.js"></script>
+
+        <!-- Required to send coverage data at the end of the test run on this page -->
+        <script src="/testem.js"></script>
+        <script src="/coverage/client/coverageSender.js"></script>
+
+        <script src="../js/openURLsTests.js"></script>
+    </head>
+
+    <body id="body">
+        <h1 id="qunit-header">Morphic: Open in Same Tab tests</h1>
+        <h2 id="qunit-banner"></h2>
+        <div id="qunit-testrunner-toolbar"></div>
+        <h2 id="qunit-userAgent"></h2>
+        <ol id="qunit-tests"></ol>
+        <!-- Test Markup -->
+    </body>
+</html>
