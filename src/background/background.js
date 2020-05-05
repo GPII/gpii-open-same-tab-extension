@@ -14,14 +14,14 @@
 
 "use strict";
 
-var openURL = function (url, refresh) {
-    var urlObj = new URL(url);
-    var queryURL = urlObj.href.replace(urlObj.protocol, "*:");
-    chrome.tabs.query({url: queryURL}, function (tabs) {
-        var matchedTab = tabs[0];
+const openURL = (url, refresh) => {
+    const urlObj = new URL(url);
+    const queryURL = urlObj.href.replace(urlObj.protocol, "*:");
+    chrome.tabs.query({url: queryURL}, tabs => {
+        const matchedTab = tabs[0];
 
-        chrome.tabs.query({"status": "loading", "windowId": chrome.windows.WINDOW_ID_CURRENT}, function (tabs) {
-            var loadingTab = tabs[0];
+        chrome.tabs.query({"status": "loading", "windowId": chrome.windows.WINDOW_ID_CURRENT}, tabs => {
+            const loadingTab = tabs[0];
             if (matchedTab) {
                 chrome.windows.update(matchedTab.windowId, {focused: true});
                 chrome.tabs.highlight({windowId: matchedTab.windowId, tabs: matchedTab.index});
@@ -30,29 +30,27 @@ var openURL = function (url, refresh) {
                     chrome.tabs.reload(matchedTab.id);
                 }
             } else {
-                chrome.tabs.update(loadingTab.id, {url: url});
+                chrome.tabs.update(loadingTab.id, {url});
             }
         });
     });
 };
 
-var identifiers = {
+const identifiers = {
     openTab: "opensametab.morphic.org",
     refreshTab: "refreshsametab.morphic.org"
 };
 
-var getFilter = function (identifiers) {
-    var urls = Object.keys(identifiers).map(function (key) {
-        return "*://" + identifiers[key] + "/*";
-    });
+const getFilter = identifiers => {
+    const urls = Object.keys(identifiers).map(key => `*://${identifiers[key]}/*`);
 
-    return {urls: urls};
+    return {urls};
 };
 
-var handleRequest = function (details) {
-    var refresh = details.url.indexOf(identifiers.refreshTab) >= 0;
-    var url = details.url.replace(identifiers[refresh ? "refreshTab" : "openTab"] + "/", "");
-    var response;
+const handleRequest = details => {
+    const refresh = details.url.indexOf(identifiers.refreshTab) >= 0;
+    const url = details.url.replace(`${identifiers[refresh ? "refreshTab" : "openTab"]}/`, "");
+    let response;
 
     // if clicking on a filtered link, in the browser, should just redirect to the correct link
     if (details.initiator) {
