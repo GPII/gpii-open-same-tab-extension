@@ -14,11 +14,15 @@
 
 module.exports = {
     sourceDir: "./src",
+    artifactsDir: "./build",
     run: {
         // Due to https://github.com/mozilla/web-ext/issues/1862
         // the following configuration is specified in the npm script instead. Once that
         // issue has been addressed, the targets can be removed from the script and just
         // use the configuration here instead.
         // target: ["firefox-desktop", "chromium"]
+    },
+    build: {
+        overwriteDest: true
     }
 };

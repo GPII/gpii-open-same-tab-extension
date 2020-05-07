@@ -20,12 +20,26 @@ npm install
 
 ### Build
 
-The src directory should contain all of the relevant code to be packaged for the extension. The only explicit build
-step needed is to pull in the 3rd party dependencies. That can be done after `npm install` by running the following
-grunt task:
+#### Including depdencies
+
+For testing the extension in the browser, you'll need to ensure that the 3rd party dependencies have been copied to the
+source directory. This is performed by the following grunt task:
 
 ```bash
 grunt loadDependencies
+```
+
+The above grunt task is included in the necessary npm scripts, but if you are not using those, you may need to call it
+manually.
+
+#### Packaging
+
+When you are ready to release, or need to manually test in some browsers, you'll want to package the extension. This
+can be done manually by zipping the contents of the `src` directory. However, you can also use the following NPM script
+to generate the package and output to the `build` directory.
+
+```
+npm run build
 ```
 
 ## Testing and Debugging
@@ -37,6 +51,7 @@ Requirements:
 * [Google Chrome browser](https://www.google.com/chrome/browser/desktop/)
 * [Firefox Browser](https://firefox.com)
 
+#### Using web-ext
 Using [web-ext](https://github.com/mozilla/web-ext) you are able to run an instance of the extension in Chrome and
 Firefox from the local source code. web-ext will even monitor changes and update the extension on the fly.
 
@@ -47,6 +62,10 @@ npm run dev
 #Press R to reload
 #Press Ctrl-C to quit
 ```
+
+##### Manually loading extensions
+
+See [Temporarily Install Firefox](https://extensionworkshop.com/documentation/develop/temporary-installation-in-firefox/) and Chrome's [Gettings Started Tutorial](https://developer.chrome.com/extensions/getstarted) for information on how to manually install in development extensions into the browsers. If you require a packaged version, you can run a build first and source it from the `build` directory. Otherwise you can install the code directly from the `src` directory.
 
 ### Debugging
 
