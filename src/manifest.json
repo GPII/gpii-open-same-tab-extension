@@ -21,6 +21,7 @@
     },
     "background": {
         "scripts": [
+            "lib/browser-polyfill.min.js",
             "background/openURLs.js",
             "background/background.js"
         ]

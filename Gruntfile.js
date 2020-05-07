@@ -10,26 +10,44 @@
  * https://github.com/GPII/gpii-open-same-tab-extension/blob/master/LICENSE.txt
  */
 
- /* global module */
-
 "use strict";
 
 module.exports = function (grunt) {
 
     grunt.initConfig({
         pkg: grunt.file.readJSON("package.json"),
-        lintAll: {
-            sources: {
-                md: [ "./*.md"],
-                js: ["./tests/**/*.js", "./src/**/*.js", "./*.js"],
-                json: ["./src/**/*.json", "./*.json", "./.*.json"],
-                other: ["./.*"]
+        eslint: {
+            options: {
+                format: "tap"
+            },
+            sources: ["./tests", "./src", "./*.js"]
+        },
+        copy: {
+            lib: {
+                //TODO: Currently there is a bug in Chrome that prevents source maps from working for extensions.
+                //      see: https://bugs.chromium.org/p/chromium/issues/detail?id=212374
+                //      After the above issue is fixed, include source maps and/or additional build types to improve
+                //      debugging.
+                files: [{
+                    expand: true,
+                    flatten: true,
+                    src: "node_modules/webextension-polyfill/dist/browser-polyfill.min.js",
+                    dest: "src/lib/"
+                }]
+            }
+        },
+        clean: {
+            lib: {
+                src: ["src/lib/"]
             }
         }
     });
 
-    grunt.loadNpmTasks("gpii-grunt-lint-all");
+    grunt.loadNpmTasks("grunt-contrib-copy");
+    grunt.loadNpmTasks("grunt-contrib-clean");
+    grunt.loadNpmTasks("grunt-eslint");
 
-    grunt.registerTask("lint", "Perform all standard lint checks.", ["lint-all"]);
+    grunt.registerTask("loadDependencies", "Copy dependencies from node_modules to lib directory.", ["clean", "copy"]);
+    grunt.registerTask("lint", "Perform all standard lint checks.", ["eslint"]);
     grunt.registerTask("default", ["lint"]);
 };

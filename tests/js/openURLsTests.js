@@ -10,10 +10,15 @@
  * https://github.com/GPII/gpii-open-same-tab-extension/blob/master/LICENSE.txt
  */
 
-/* global fluid, jqUnit, openURLs, chrome, sinon */
+/* global jqUnit, openURLs, browser, sinon */
 "use strict";
 
 (function () {
+
+    // Due to a https://github.com/acvetkov/sinon-chrome/issues/100 sinon-chrome's webextension stubs
+    // are in the `chrome` namespace instead of `browser`. The following maps the `chrome` namespaced stubs
+    // to `browser`
+    window.browser = window.chrome;
 
     /************************************************************************************************************
      * openURLS.getFilter tests
@@ -59,65 +64,83 @@
      * openURLs.openURL tests
      ************************************************************************************************************/
 
-    const openTabTestCases = [{
-        name: "Open Existing",
-        existing: true
-    }, {
-        name: "Refresh Existing",
-        existing: true,
-        refresh: true
-    }, {
-        name: "Open New"
-    }, {
-        name: "Open New (with refresh arg)",
-        refresh: true
-    }];
-
-    jqUnit.test("test openURLs.openTab", () => {
-        const matchingTab = {
+    const openTabTestsProps = {
+        testCases: [{
+            name: "Open Existing",
+            existing: true
+        }, {
+            name: "Refresh Existing",
+            existing: true,
+            refresh: true
+        }, {
+            name: "Open New"
+        }, {
+            name: "Open New (with refresh arg)",
+            refresh: true
+        }, {
+            name: "Open New - no loading tab",
+            noLoading: true
+        }, {
+            name: "Open New (with refresh arg) - no loading tab",
+            refresh: true,
+            noLoading: true
+        }],
+        matchingTab: {
             windowId: 88,
             index: 2,
             id: 23
-        };
-
-        const loadingTab = {
+        },
+        loadingTab: {
             id: 24
-        };
+        },
+        blankTab: {
+            id: 1
+        },
+        url: "https://actual.org/url",
+        queryURL: "*://actual.org/url"
+    };
 
-        openTabTestCases.forEach(testCase => {
-            chrome.tabs.query.onFirstCall().yields(testCase.existing ? [matchingTab] : []);
-            chrome.tabs.query.onSecondCall().yields([loadingTab]);
+    openTabTestsProps.testCases.forEach(testCase => {
+        jqUnit.asyncTest(`test openURLs.openTab - ${testCase.name}`, async () => {
 
-            const url = "https://actual.org/url";
-            const queryURL = "*://actual.org/url";
+            browser.tabs.query.onFirstCall().resolves(testCase.existing ? [openTabTestsProps.matchingTab] : []);
+            browser.tabs.query.onSecondCall().resolves(testCase.noLoading ? [] : [openTabTestsProps.loadingTab]);
+            browser.tabs.query.onThirdCall().resolves([openTabTestsProps.blankTab]);
 
-            openURLs.openTab(url, testCase.refresh);
+            let loadingTab = testCase.noLoading ? openTabTestsProps.blankTab : openTabTestsProps.loadingTab;
 
-            jqUnit.assertTrue(`${testCase.name}: Tabs queried for matching URLs`, chrome.tabs.query.calledWith({url: queryURL}));
-            jqUnit.assertTrue(`${testCase.name}: Tabs queried for loading URLs`, chrome.tabs.query.calledWith({"status": "loading", "windowId": chrome.windows.WINDOW_ID_CURRENT}));
+            await openURLs.openTab(openTabTestsProps.url, testCase.refresh);
+
+            jqUnit.assertTrue("Tabs queried for matching URLs", browser.tabs.query.calledWith({url: openTabTestsProps.queryURL}));
+            jqUnit.assertTrue("Tabs queried for loading URLs", browser.tabs.query.calledWith({"status": "loading", "windowId": browser.windows.WINDOW_ID_CURRENT}));
 
             if (testCase.existing) {
-                jqUnit.assertTrue(`${testCase.name}: Window for matching tab focused`, chrome.windows.update.calledOnceWithExactly(matchingTab.windowId, {focused: true}));
-                jqUnit.assertTrue(`${testCase.name}: Matching tab highlighted`, chrome.tabs.highlight.calledOnceWithExactly({windowId: matchingTab.windowId, tabs: matchingTab.index}));
-                jqUnit.assertTrue(`${testCase.name}: Removed loading tab`, chrome.tabs.remove.calledOnceWithExactly(loadingTab.id));
-                jqUnit.assertTrue(`${testCase.name}: Tab isn't updated`, chrome.tabs.update.notCalled);
+                jqUnit.assertTrue("Window for matching tab focused", browser.windows.update.calledOnceWithExactly(openTabTestsProps.matchingTab.windowId, {focused: true}));
+                jqUnit.assertTrue("Matching tab highlighted", browser.tabs.highlight.calledOnceWithExactly({
+                    windowId: openTabTestsProps.matchingTab.windowId,
+                    tabs: openTabTestsProps.matchingTab.index
+                }));
+                jqUnit.assertTrue("Removed loading tab", browser.tabs.remove.calledOnceWithExactly(loadingTab.id));
+                jqUnit.assertTrue("Tab isn't updated", browser.tabs.update.notCalled);
 
                 if (testCase.refresh) {
-                    jqUnit.assertTrue(`${testCase.name}: Matching tab is refreshed`, chrome.tabs.reload.calledOnceWithExactly(matchingTab.id));
+                    jqUnit.assertTrue("Matching tab is refreshed", browser.tabs.reload.calledOnceWithExactly(openTabTestsProps.matchingTab.id));
                 } else {
-                    jqUnit.assertTrue(`${testCase.name}: Tab isn't reloaded`, chrome.tabs.reload.notCalled);
+                    jqUnit.assertTrue("Tab isn't reloaded", browser.tabs.reload.notCalled);
                 }
 
             } else {
-                jqUnit.assertTrue(`${testCase.name}: Window isn't explicitly focused`, chrome.windows.update.notCalled);
-                jqUnit.assertTrue(`${testCase.name}: Tab isn't highlighted`, chrome.tabs.highlight.notCalled);
-                jqUnit.assertTrue(`${testCase.name}: Loading tab isnt' removed`, chrome.tabs.remove.notCalled);
-                jqUnit.assertTrue(`${testCase.name}: Tab isn't reloaded`, chrome.tabs.reload.notCalled);
-                jqUnit.assertTrue(`${testCase.name}: Loading tab is updated with correct URL`, chrome.tabs.update.calledOnceWithExactly(loadingTab.id, {url}));
+                jqUnit.assertTrue("Window isn't explicitly focused", browser.windows.update.notCalled);
+                jqUnit.assertTrue("Tab isn't highlighted", browser.tabs.highlight.notCalled);
+                jqUnit.assertTrue("Loading tab isnt' removed", browser.tabs.remove.notCalled);
+                jqUnit.assertTrue("Tab isn't reloaded", browser.tabs.reload.notCalled);
+                let isUpdatedCalled = browser.tabs.update.calledOnceWithExactly(loadingTab.id, {url: openTabTestsProps.url});
+                jqUnit.assertTrue("Loading tab is updated with correct URL", isUpdatedCalled);
             }
 
-            // clean up
-            chrome.flush();
+            // teardown
+            browser.flush();
+            jqUnit.start();
         });
     });
 
@@ -188,11 +211,11 @@
 
         openURLs.bindListener();
 
-        let isCalledProperly = chrome.webRequest.onBeforeRequest.addListener.calledOnceWithExactly(openURLs.handleRequest, filter, opts);
-        jqUnit.assertTrue("The chrome.webRequest.onBeforeRequest.addListener method was called with the correct args", isCalledProperly);
+        let isCalledProperly = browser.webRequest.onBeforeRequest.addListener.calledOnceWithExactly(openURLs.handleRequest, filter, opts);
+        jqUnit.assertTrue("The browser.webRequest.onBeforeRequest.addListener method was called with the correct args", isCalledProperly);
 
         // cleanup
-        chrome.flush();
+        browser.flush();
     });
 
     jqUnit.test("trigger onBeforeRequest event", () => {
@@ -200,15 +223,15 @@
         const details = {test: "test"};
 
 
-        chrome.webRequest.onBeforeRequest.dispatch(details);
+        browser.webRequest.onBeforeRequest.dispatch(details);
         jqUnit.assertFalse("The handleRequest method should not have been triggered before the onBeforeRequest listener is bound", handelRequestStub.called);
 
         openURLs.bindListener();
-        chrome.webRequest.onBeforeRequest.dispatch(details);
+        browser.webRequest.onBeforeRequest.dispatch(details);
         jqUnit.assertTrue("The onBeforeRequest handler should be called once, after triggering the onBeforeRequest event", handelRequestStub.calledOnceWithExactly(details));
 
         // cleanup
-        chrome.flush();
+        browser.flush();
         handelRequestStub.restore();
     });
 

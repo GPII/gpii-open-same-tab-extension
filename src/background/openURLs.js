@@ -10,33 +10,35 @@
  * https://github.com/GPII/gpii-open-same-tab-extension/blob/master/LICENSE.txt
  */
 
-/* global chrome */
+/* global browser */
 
 "use strict";
 
 const openURLs = {};
 
-openURLs.openTab = (url, refresh) => {
+openURLs.openTab = async (url, refresh) => {
     const urlObj = new URL(url);
     const queryURL = urlObj.href.replace(urlObj.protocol, "*:");
-    chrome.tabs.query({url: queryURL}, tabs => {
-        const matchedTab = tabs[0];
 
-        chrome.tabs.query({"status": "loading", "windowId": chrome.windows.WINDOW_ID_CURRENT}, tabs => {
-            const loadingTab = tabs[0];
+    let [matchedTab] = await browser.tabs.query({url: queryURL});
+    let [loadingTab] = await browser.tabs.query({"status": "loading", "windowId": browser.windows.WINDOW_ID_CURRENT});
 
-            if (matchedTab) {
-                chrome.windows.update(matchedTab.windowId, {focused: true});
-                chrome.tabs.highlight({windowId: matchedTab.windowId, tabs: matchedTab.index});
-                chrome.tabs.remove(loadingTab.id);
-                if (refresh) {
-                    chrome.tabs.reload(matchedTab.id);
-                }
-            } else {
-                chrome.tabs.update(loadingTab.id, {url});
-            }
-        });
-    });
+    // In Firefox onload if we try to enter in the URL in the only tab it may not indicate it is `loading`
+    // This appears to only happen if only a single default tab is open, so we just use that one as the loading tab.
+    if (!loadingTab) {
+        [loadingTab] = await browser.tabs.query({});
+    }
+
+    if (matchedTab) {
+        browser.windows.update(matchedTab.windowId, {focused: true});
+        browser.tabs.highlight({windowId: matchedTab.windowId, tabs: matchedTab.index});
+        browser.tabs.remove(loadingTab.id);
+        if (refresh) {
+            browser.tabs.reload(matchedTab.id);
+        }
+    } else {
+        browser.tabs.update(loadingTab.id, {url});
+    }
 };
 
 openURLs.identifiers = {
@@ -60,5 +62,5 @@ openURLs.handleRequest = details => {
 };
 
 openURLs.bindListener = () => {
-    chrome.webRequest.onBeforeRequest.addListener(openURLs.handleRequest, openURLs.getFilter(openURLs.identifiers), ["blocking"]);
+    browser.webRequest.onBeforeRequest.addListener(openURLs.handleRequest, openURLs.getFilter(openURLs.identifiers), ["blocking"]);
 };
