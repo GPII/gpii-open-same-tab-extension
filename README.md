@@ -71,8 +71,7 @@ See [Temporarily Install Firefox](https://extensionworkshop.com/documentation/de
 
 ### Firefox
 
-When launching the extension in Firefow using web-ext, the browser console should open at the same time. This will
-contain useful log. You can also bring up the debugger by going to "about:debugging" in the Awesomebar (Address Bar).
+You can bring up the debugger by going to "about:debugging" in the Awesomebar (Address Bar).
 
 See the [Debugging](https://extensionworkshop.com/documentation/develop/debugging/) documentation provided in the
 [Firefox Extension Workshop](https://extensionworkshop.com/) for more details.
@@ -106,10 +105,10 @@ For example, `http://opensametab.morphic.org/en.wikipedia.org/wiki/URL` will ope
 
 #### Caveats
 
-When using web-ext for testing the extensions a new instance of the browser is created. You may not be able to launch
+When using web-ext for testing the extensions, a new instance of the browser is created. You may not be able to launch
 URLs into this particular instance from outside of the browser, even if it is the default browser. The main instance of
-the browser may load instead. If this is happens, you'll need to test URLs by directly inputting them into the address
-bar.
+the browser may load instead. If this happens, you'll need to test URLs by directly inputting them into the address
+bar. You may also wish to manually load the extensions instead.
 
 ### Linting
 
