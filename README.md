@@ -1,5 +1,7 @@
 # gpii-open-same-tab-extension
 
+![CI build status badge](https://github.com/GPII/gpii-open-same-tab-extension/workflows/CI/badge.svg)
+
 A browser extension for opening a Morphic MYOB link in an existing tab.
 
 ## Building the extension
