@@ -17,8 +17,7 @@
 const openURLs = {};
 
 openURLs.openTab = async (url, refresh) => {
-    const urlObj = new URL(url);
-    const queryURL = urlObj.href.replace(urlObj.protocol, "*:");
+    const queryURL = url.href.replace(url.protocol, "*:");
 
     let [matchedTab] = await browser.tabs.query({url: queryURL});
     let [loadingTab] = await browser.tabs.query({"status": "loading", "windowId": browser.windows.WINDOW_ID_CURRENT});
@@ -37,7 +36,7 @@ openURLs.openTab = async (url, refresh) => {
             browser.tabs.reload(matchedTab.id);
         }
     } else {
-        browser.tabs.update(loadingTab.id, {url});
+        browser.tabs.update(loadingTab.id, {url: url.href});
     }
 };
 
@@ -53,12 +52,21 @@ openURLs.getFilter = identifiers => {
 };
 
 openURLs.handleRequest = details => {
-    const refresh = details.url.indexOf(openURLs.identifiers.refreshTab) >= 0;
-    const url = details.url.replace(`${openURLs.identifiers[refresh ? "refreshTab" : "openTab"]}/`, "");
+    const url = new URL(details.url);
+    const refresh = url.hostname.indexOf(openURLs.identifiers.refreshTab) >= 0;
+    // URL will look like: "http://opensametab.morphic.org/redirect/https%3A%2F%2Fexample.com%2F"
+    const destination = url.pathname.replace(/^\/(redirect\/)?(.*)/, (match, c1, c2) => decodeURIComponent(c2));
 
-    openURLs.openTab(url, refresh);
+    let success;
+    try {
+        const destinationUrl = new URL(destination);
+        openURLs.openTab(destinationUrl, refresh);
+        success = true;
+    } catch (e) {
+        success = false;
+    }
 
-    return {cancel: true};
+    return {cancel: success};
 };
 
 openURLs.bindListener = () => {
