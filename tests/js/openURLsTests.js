@@ -96,7 +96,7 @@
         blankTab: {
             id: 1
         },
-        url: "https://actual.org/url",
+        url: new URL("https://actual.org/url"),
         queryURL: "*://actual.org/url"
     };
 
@@ -134,7 +134,7 @@
                 jqUnit.assertTrue("Tab isn't highlighted", browser.tabs.highlight.notCalled);
                 jqUnit.assertTrue("Loading tab isnt' removed", browser.tabs.remove.notCalled);
                 jqUnit.assertTrue("Tab isn't reloaded", browser.tabs.reload.notCalled);
-                let isUpdatedCalled = browser.tabs.update.calledOnceWithExactly(loadingTab.id, {url: openTabTestsProps.url});
+                let isUpdatedCalled = browser.tabs.update.calledOnceWithExactly(loadingTab.id, {url: openTabTestsProps.url.href});
                 jqUnit.assertTrue("Loading tab is updated with correct URL", isUpdatedCalled);
             }
 
@@ -151,29 +151,29 @@
     const handlestRequestTestCases = [{
         name: "Open same tab",
         details: {
-            url: "https://opensametab.morphic.org/actual.org/url"
+            url: "https://opensametab.morphic.org/redirect/https%3A%2F%2Factual.org/url"
         },
         expected: {
             response: {cancel: true},
-            args: ["https://actual.org/url", false]
+            args: [new URL("https://actual.org/url"), false]
         }
     }, {
         name: "Refresh tab",
         details: {
-            url: "http://refreshsametab.morphic.org/actual.org/url"
+            url: "http://refreshsametab.morphic.org/redirect/http%3A%2F%2Factual.org/url"
         },
         expected: {
             response: {cancel: true},
-            args: ["http://actual.org/url", true]
+            args: [new URL("http://actual.org/url"), true]
         }
     }, {
         name: "Unfiltered URL",
         details: {
-            url: "http://morphic.org/actual.org/url"
+            url: "http://morphic.org/redirect/https%3A%2F%2Factual.org/url"
         },
         expected: {
             response: {cancel: true},
-            args: ["http://morphic.org/actual.org/url", false]
+            args: [new URL("http://morphic.org/redirect/https%3A%2F%2Factual.org/url"), false]
         }
     }];
 
