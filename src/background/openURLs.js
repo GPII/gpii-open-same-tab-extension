@@ -58,12 +58,16 @@ openURLs.handleRequest = details => {
     const destination = url.pathname.replace(/^\/(redirect\/)?(.*)/, (match, c1, c2) => decodeURIComponent(c2));
 
     let success;
+    // Validate the URL.
     try {
         const destinationUrl = new URL(destination);
-        openURLs.openTab(destinationUrl, refresh);
         success = true;
     } catch (e) {
         success = false;
+    }
+
+    if (success) {
+        openURLs.openTab(destinationUrl, refresh);
     }
 
     return {cancel: success};
