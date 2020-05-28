@@ -193,7 +193,7 @@
             let response = openURLs.handleRequest(testCase.details);
             jqUnit.assertDeepEq(`${testCase.name}: the response is returned correctly`, testCase.expected.response, response);
 
-            let isOpenTabCalledProperly = !testCase.expected.args || openTabStub.calledOnceWithExactly.apply(openTabStub, testCase.expected.args)
+            let isOpenTabCalledProperly = !testCase.expected.args || openTabStub.calledOnceWithExactly.apply(openTabStub, testCase.expected.args);
             jqUnit.assertTrue(`${testCase.name}: the openURLs.openTab method was called with the correct args`, isOpenTabCalledProperly);
 
             // clean up
