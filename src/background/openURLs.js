@@ -57,20 +57,18 @@ openURLs.handleRequest = details => {
     // URL will look like: "http://opensametab.morphic.org/redirect/https%3A%2F%2Fexample.com%2F"
     const destination = url.pathname.replace(/^\/(redirect\/)?(.*)/, (match, c1, c2) => decodeURIComponent(c2));
 
-    let success;
-    // Validate the URL.
+    let destinationUrl;
     try {
-        const destinationUrl = new URL(destination);
-        success = true;
+        destinationUrl = new URL(destination);
     } catch (e) {
-        success = false;
+        // ignored
     }
 
-    if (success) {
+    if (destinationUrl) {
         openURLs.openTab(destinationUrl, refresh);
     }
 
-    return {cancel: success};
+    return {cancel: !!destinationUrl};
 };
 
 openURLs.bindListener = () => {
