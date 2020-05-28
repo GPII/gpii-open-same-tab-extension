@@ -175,6 +175,15 @@
             response: {cancel: true},
             args: [new URL("http://morphic.org/redirect/https%3A%2F%2Factual.org/url"), false]
         }
+    }, {
+        name: "Bad URL",
+        details: {
+            url: "http://morphic.org/redirect/stupid"
+        },
+        expected: {
+            response: {cancel: false},
+            args: null
+        }
     }];
 
     jqUnit.test("test openURLs.handleRequest", () => {
@@ -184,7 +193,7 @@
             let response = openURLs.handleRequest(testCase.details);
             jqUnit.assertDeepEq(`${testCase.name}: the response is returned correctly`, testCase.expected.response, response);
 
-            let isOpenTabCalledProperly = openTabStub.calledOnceWithExactly.apply(openTabStub, testCase.expected.args);
+            let isOpenTabCalledProperly = !testCase.expected.args || openTabStub.calledOnceWithExactly.apply(openTabStub, testCase.expected.args)
             jqUnit.assertTrue(`${testCase.name}: the openURLs.openTab method was called with the correct args`, isOpenTabCalledProperly);
 
             // clean up
