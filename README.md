@@ -22,7 +22,7 @@ npm install
 
 ### Build
 
-#### Including depdencies
+#### Including dependencies
 
 For testing the extension in the browser, you'll need to ensure that the 3rd party dependencies have been copied to the
 source directory. This is performed by the following grunt task:
@@ -103,7 +103,7 @@ In both cases the extension will intercept the URL, remove the identifier and pa
 existing tabs/windows open to the requested URL, the URL is handled as normal. If one already exists it will open to
 that existing tab instead. In the case of `refreshsametab.morphic.org`, it will also trigger the page to reload.
 
-For example, `http://opensametab.morphic.org/en.wikipedia.org/wiki/URL` will open `https://en.wikipedia.org/wiki/URL`.
+For example, `http://opensametab.morphic.org/redirect/https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FURL` will open `https://en.wikipedia.org/wiki/URL`.
 
 #### Caveats
 
